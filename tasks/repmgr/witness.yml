@@ -1,0 +1,12 @@
+---
+
+- name: create witness server
+  shell: repmgr -h {{ master_server_host }} -U repmgr -d repmgr -f /etc/repmgr.conf -D {{ postgresql_data_directory }} -F witness create
+  become: true
+  become_user: 'postgres'
+
+- name: register witness server
+  shell: repmgr -f /etc/repmgr.conf witness register
+  become: true
+  become_user: 'postgres'
+  ignore_errors: True

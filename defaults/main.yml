@@ -679,7 +679,30 @@ postgresql_pgtune_type: Mixed
 # Maximum number of expected connections, if "no", default based on db type
 postgresql_pgtune_connections: no
 
-
+#------------------------------------------------------------------------------
+# REPMGR
+#------------------------------------------------------------------------------
+# Should we setup repmgr?
+postgresql_repmgr: no
+postgresql_repmgr_role: 'master'
+postgresql_repmgr_cluster: 'test'
+postgresql_repmgr_node: 1
+postgresql_repmgr_node_name: 'node1'
+postgresql_repmgr_dbname: 'repmgr'
+postgresql_repmgr_user: 'repmgr'
+postgresql_repmgr_port: 5432
+postgresql_repmgr_upstream_node: -1
+postgresql_repmgr_use_replication_slots: 0
+postgresql_repmgr_loglevel: 'NOTICE'
+postgresql_repmgr_logfacility: STDERR
+postgresql_repmgr_logfile: '/var/log/repmgr/repmgr.log'
+postgresql_repmgr_pg_bindir: '/usr/lib/postgresql/9.6/bin/'
+postgresql_repmgr_rsync_options: '--archive --checksum --compress --progress --rsh="ssh -o \"StrictHostKeyChecking no\"'
+postgresql_repmgr_ssh_options: '-o "StrictHostKeyChecking no"'
+postgresql_repmgr_failover: 'manual'
+postgresql_repmgr_priority: 100
+postgresql_repmgr_promote_command: 'repmgr standby promote -f /etc/repmgr.conf'
+postgresql_repmgr_follow_command: 'repmgr standby follow -f /etc/repmgr.conf -W'
 
 
 postgresql_env:

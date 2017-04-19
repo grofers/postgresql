@@ -1,0 +1,17 @@
+---
+
+- name: Clone to standby (Better to run in screen or tmux on the instance manually)
+  shell: repmgr -h {{ master_server_host }} -U repmgr -d repmgr -D {{ postgresql_data_directory }} -f /etc/repmgr.conf -F standby clone
+  become: true
+  become_user: 'postgres'
+  ignore_errors: true
+
+- name: PostgreSQL | Ensure PostgreSQL is running
+  service:
+    name: "{{ postgresql_service_name }}"
+    state: started
+
+- name: Register standby
+  shell: repmgr -f /etc/repmgr.conf standby register
+  become: true
+  become_user: 'postgres'

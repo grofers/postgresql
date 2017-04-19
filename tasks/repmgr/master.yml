@@ -1,0 +1,7 @@
+---
+
+- name: Register master
+  shell: repmgr -f /etc/repmgr.conf master register
+  become: true
+  become_user: 'postgres'
+  ignore_errors: true

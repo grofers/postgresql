@@ -22,13 +22,19 @@
 
 - include: users.yml
   tags: [postgresql, postgresql-users]
+  when: postgresql_repmgr_role == 'master'
 
 - include: databases.yml
   tags: [postgresql, postgresql-databases]
+  when: postgresql_repmgr_role == 'master'
 
 - include: users_privileges.yml
   tags: [postgresql, postgresql-users]
+  when: postgresql_repmgr_role == 'master'
 
 - include: monit.yml
   when: monit_protection is defined and monit_protection == true
   tags: [postgresql, postgresql-monit]
+
+- include: repmgr/main.yml
+  tags: [postgresql, postgresql-repmgr]

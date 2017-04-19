@@ -1,0 +1,8 @@
+---
+
+- name: repmgr | Setup repmgr configuration
+  template:
+    src: repmgr.conf.j2
+    dest: /etc/repmgr.conf
+    owner: postgres
+    group: postgres

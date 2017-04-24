@@ -31,7 +31,7 @@ node_name={{ postgresql_repmgr_node_name }}  # an arbitrary (but unique) string;
 #
 #   https://www.postgresql.org/docs/current/static/libpq-connect.html#LIBPQ-CONNSTRING
 #
-conninfo='host={{ ansible_eth0.ipv4.address }} dbname={{ postgresql_repmgr_database }} user={{ postgresql_repmgr_user}} port={{ postgresql_repmgr_port }}'
+conninfo='host={{ postgresql_repmgr_host  }} dbname={{ postgresql_repmgr_database }} user={{ postgresql_repmgr_user}} port={{ postgresql_repmgr_port }} {% if postgresql_repmgr_password is defined %} password=postgresql_repmgr_password {% endif %}'
 #
 # If repmgrd is in use, consider explicitly setting `connect_timeout` in the
 # conninfo string to determine the length of time which elapses before

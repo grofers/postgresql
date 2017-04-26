@@ -31,7 +31,7 @@ node_name={{ postgresql_repmgr_node_name }}  # an arbitrary (but unique) string;
 #
 #   https://www.postgresql.org/docs/current/static/libpq-connect.html#LIBPQ-CONNSTRING
 #
-conninfo='host={{ postgresql_repmgr_host  }} dbname={{ postgresql_repmgr_database }} user={{ postgresql_repmgr_user}} port={{ postgresql_repmgr_port }} {% if postgresql_repmgr_password is defined %} password=postgresql_repmgr_password {% endif %}'
+conninfo='host={{ postgresql_repmgr_host  }} dbname={{ postgresql_repmgr_database }} user={{ postgresql_repmgr_user}} port={{ postgresql_repmgr_port }} {% if postgresql_repmgr_password is defined %} password={{ postgresql_repmgr_password }} {% endif %}'
 #
 # If repmgrd is in use, consider explicitly setting `connect_timeout` in the
 # conninfo string to determine the length of time which elapses before
@@ -54,7 +54,7 @@ conninfo='host={{ postgresql_repmgr_host  }} dbname={{ postgresql_repmgr_databas
 
 # use physical replication slots - PostgreSQL 9.4 and later only
 # (default: 0)
-#use_replication_slots=0
+use_replication_slots={{ postgresql_repmgr_use_replication_slots }}
 
 # NOTE: 'max_replication_slots' should be configured for at least the
 # number of standbys which will connect to the primary.
@@ -93,12 +93,16 @@ logfile='/var/log/repmgr/repmgr.log'
 # so should be quoted in the provided command configuration, e.g.:
 #
 #event_notification_command='/path/to/some/script %n %e %s "%t" "%d"'
-
+{% if postgresql_repmgr_event_notification_command is defined %}
+event_notification_command='{{ postgresql_repmgr_event_notification_command }}'
+{% endif %}
 # By default, all notifications will be passed; the notification types
 # can be filtered to explicitly named ones:
 #
 #event_notifications=master_register,standby_register,witness_create
-
+{% if postgresql_repmgr_event_notifications is defined %}
+event_notifications={{ postgresql_repmgr_event_notifications }}
+{% endif %}
 
 # Environment/command settings
 # ----------------------------
@@ -134,6 +138,21 @@ pg_bindir={{ postgresql_repmgr_pg_bindir }}
 # service_restart_command = systemctl restart postgresql-9.5
 # service_reload_command = pg_ctlcluster 9.5 main reload
 # service_promote_command = pg_ctlcluster 9.5 main promote
+{% if postgresql_repmgr_service_start_command is defined %}
+service_start_command = {{ postgresql_repmgr_service_start_command }}
+{% endif %}
+{% if postgresql_repmgr_service_stop_command is defined %}
+service_stop_command = {{ postgresql_repmgr_service_stop_command }}
+{% endif %}
+{% if postgresql_repmgr_service_restart_command is defined %}
+service_restart_command = {{ postgresql_repmgr_service_restart_command }}
+{% endif %}
+{% if postgresql_repmgr_service_reload_command is defined %}
+service_reload_command = {{ postgresql_repmgr_service_reload_command }}
+{% endif %}
+{% if postgresql_repmgr_service_promote_command is defined %}
+service_promote_command = {{ postgresql_repmgr_service_promote_command }}
+{% endif %}
 
 # external command options
 
@@ -144,14 +163,26 @@ ssh_options={{ postgresql_repmgr_ssh_options }}
 
 #pg_ctl_options='-s'
 #pg_basebackup_options='--label=repmgr_backup'
+{% if postgresql_repmgr_pg_ctl_options is defined %}
+pg_ctl_options={{ postgresql_repmgr_pg_ctl_options }}
+{% endif %}
+{% if postgresql_repmgr_pg_basebackup_options is defined %}
+pg_basebackup_options={{ postgresql_repmgr_pg_basebackup_options }}
+{% endif %}
 
 # This is the host name of the barman server, which is used for connecting over
 # to the barman server (passwordless ssh keys should be in place)
 #barman_server='backup_server'
+{% if postgresql_repmgr_barman_server is defined %}
+barman_server='{{ postgresql_repmgr_barman_server }}'
+{% endif %}
 # If you are placing the barman.conf file in a non-standard path, or using
 # a name other than barman.conf, use this parameter to specify the path and
 # name of the barman configuration file.
 #barman_config='/path/to/barman.conf'
+{% if postgresql_repmgr_barman_config is defined %}
+barman_config='{{ postgresql_repmgr_barman_config }}'
+{% endif %}
 
 # Standby clone settings
 # ----------------------
@@ -161,11 +192,17 @@ ssh_options={{ postgresql_repmgr_ssh_options }}
 # Tablespaces can be remapped from one file system location to another:
 #
 # tablespace_mapping=/path/to/original/tablespace=/path/to/new/tablespace
+{% if postgresql_repmgr_tablespace_mapping is defined %}
+tablespace_mapping={{ postgresql_repmgr_tablespace_mapping }}
+{% endif %}
 
 # You can specify a restore_command to be used in the recovery.conf that
 # will be placed in the cloned standby
 #
 # restore_command = cp /path/to/archived/wals/%f %p
+{% if postgresql_repmgr_restore_command is defined %}
+restore_command = {{ postgresql_repmgr_restore_command }}
+{% endif %}
 
 # Failover settings (repmgrd)
 # ---------------------------
@@ -175,16 +212,20 @@ ssh_options={{ postgresql_repmgr_ssh_options }}
 
 # monitoring interval in seconds; default is 2
 #monitor_interval_secs=2
+monitor_interval_secs={{ postgresql_repmgr_monitor_interval_secs }}
 
 # Maximum number of seconds to wait for a response from the primary server
 # before deciding it has failed.
 #master_response_timeout=5
+master_response_timeout={{ postgresql_repmgr_master_response_timeout }}
 
 # Number of attempts at what interval (in seconds) to try and
 # connect to  a server to establish its status (e.g. master
 # during failover)
 #reconnect_attempts=1
 #reconnect_interval=5
+reconnect_attempts={{ postgresql_repmgr_reconnect_attempts }}
+reconnect_interval={{ postgresql_repmgr_reconnect_interval }}
 
 # Autofailover options
 failover={{ postgresql_repmgr_failover }}    # one of 'automatic', 'manual' (default: manual)
@@ -207,6 +248,8 @@ follow_command='{{ postgresql_repmgr_follow_command }}'
 # seconds; by default this would be half an hour, as 'retry_promote_interval_secs'
 # default value is 300)
 #retry_promote_interval_secs=300
+retry_promote_interval_secs={{ postgresql_repmgr_retry_promote_interval_secs }}
 
 # Number of seconds after which the witness server resyncs the repl_nodes table
 #witness_repl_nodes_sync_interval_secs=15
+witness_repl_nodes_sync_interval_secs={{ postgresql_repmgr_witness_repl_nodes_sync_interval_secs }}

@@ -40,9 +40,12 @@
 
 - include: repmgr/main.yml
   tags: [postgresql, postgresql-repmgr]
-  when: not postgresql_client_only
+  when: postgresql_repmgr and not postgresql_client_only
 
 - include: config_pgpool2.yml 
   tags: [postgresql, postgresql-pgpool2]
   when: postgresql_pgpool2
 
+- include: collectd.yml
+  tags: [postgresql, postgresql-collectd]
+  when: postgresql_collectd == true

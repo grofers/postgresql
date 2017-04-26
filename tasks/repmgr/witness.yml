@@ -1,7 +1,16 @@
 ---
 
+- name: install pip packages
+  pip:
+    name: "pexpect"
+
 - name: create witness server
-  shell: repmgr -h {{ postgresql_master_server_host }} -U repmgr -d repmgr -f /etc/repmgr.conf -D {{ postgresql_data_directory }} -F witness create
+  expect:
+    command: repmgr --pwprompt -h {{ postgresql_master_server_host }} -U repmgr -d repmgr -f /etc/repmgr.conf -D {{ postgresql_data_directory }} -F witness create
+    responses:
+      "Enter new superuser password:": "{{ postgresql_repmgr_password }}"
+      "Enter it again:": "{{ postgresql_repmgr_password }}"
+      "Enter password for new role:": "{{ postgresql_repmgr_password }}"
   become: true
   become_user: 'postgres'
 

@@ -828,7 +828,7 @@ postgresql_pgpool2_pool_hba_custom: []
 #------------------------------------------------------------------------------
 # Should we setup repmgr?
 postgresql_repmgr: no
-postgresql_repmgr_host: {{ ansible_eth0.ipv4.address }}
+postgresql_repmgr_host: "{{ ansible_eth0.ipv4.address }}"
 postgresql_repmgr_role: 'master'
 postgresql_repmgr_cluster: 'test'
 postgresql_repmgr_node: 1
@@ -848,6 +848,12 @@ postgresql_repmgr_failover: 'manual'
 postgresql_repmgr_priority: 100
 postgresql_repmgr_promote_command: 'repmgr standby promote -f /etc/repmgr.conf'
 postgresql_repmgr_follow_command: 'repmgr standby follow -f /etc/repmgr.conf -W'
+postgresql_repmgr_monitor_interval_secs: 2
+postgresql_repmgr_reconnect_attempts: 1
+postgresql_repmgr_reconnect_interval: 5
+postgresql_repmgr_master_response_timeout: 5
+postgresql_repmgr_retry_promote_interval_secs: 300
+postgresql_repmgr_witness_repl_nodes_sync_interval_secs: 15
 
 
 postgresql_env:

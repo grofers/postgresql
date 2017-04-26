@@ -46,14 +46,13 @@
     - "postgresql-{{postgresql_version}}"
     - "postgresql-contrib-{{postgresql_version}}"
 
-- name: PostgreSQL | Install PostgreSQL
+- name: PostgreSQL | Install PostgreSQL Client
   apt:
     name: "{{item}}"
     state: present
     update_cache: yes
     cache_valid_time: "{{apt_cache_valid_time | default (3600)}}"
   environment: "{{postgresql_env}}"
-  when: postgresql_client_only
   with_items:
     - "postgresql-client-{{postgresql_version}}"
 

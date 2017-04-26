@@ -1,0 +1,105 @@
+LoadPlugin postgresql
+LoadPlugin processes
+
+<Plugin processes>
+  ProcessMatch "postgres"  "postgres"
+  CollectContextSwitch true
+</Plugin>
+
+<Plugin postgresql>
+  <Query tps>
+    Statement "SELECT datname, xact_commit + xact_rollback AS tps \
+               FROM pg_stat_database"
+    <Result>
+      Type derive
+      InstancePrefix "TPS"
+      InstancesFrom "datname"
+      ValuesFrom "tps"
+    </Result>
+  </Query>
+
+  <Query row_stats>
+    Statement "SELECT sum(n_tup_ins) AS inserts, \
+                      sum(n_tup_upd) AS updates, \
+                      sum(n_tup_del) AS deletes \
+               FROM pg_stat_user_tables"
+    <Result>
+      Type derive
+      InstancePrefix "rows_inserted"
+      ValuesFrom "inserts"
+    </Result>
+    <Result>
+      Type derive
+      InstancePrefix "rows_updated"
+      ValuesFrom "updates"
+    </Result>
+    <Result>
+      Type derive
+      InstancePrefix "rows_deleted"
+      ValuesFrom "deletes"
+    </Result>
+  </Query>
+  <Query stream_lag>
+    Statement "SELECT COALESCE(ROUND(EXTRACT(epoch from (now() - \
+               pg_last_xact_replay_timestamp()))), 0) AS time_lag"
+    <Result>
+      Type gauge
+      InstancePrefix "replication_stream_lag"
+      ValuesFrom "time_lag"
+    </Result>
+  </Query>
+
+  <Query client_activity>
+    Statement "SELECT usename, \
+                      COUNT(*) AS total, \
+                      COUNT(CASE WHEN state = 'idle' THEN 1 END) AS idle, \
+                      COUNT(CASE WHEN state LIKE 'idle in%' THEN 1 END) AS trans_idle, \
+                      COUNT(CASE WHEN state = 'active' THEN 1 END) AS active, \
+                      COUNT(CASE WHEN now()-query_start > INTERVAL '0.75s' AND state = 'active' THEN 1 END) AS slow \
+               FROM pg_stat_activity \
+               GROUP BY usename;"
+    <Result>
+      Type gauge
+      InstancePrefix "clients_total"
+      InstancesFrom "usename"
+      ValuesFrom "total"
+    </Result>
+    <Result>
+      Type gauge
+      InstancePrefix "clients_idle"
+      InstancesFrom "usename"
+      ValuesFrom "idle"
+    </Result>
+    <Result>
+      Type gauge
+      InstancePrefix "clients_idle_transaction"
+      ValuesFrom "trans_idle"
+      InstancesFrom "usename"
+    </Result>
+    <Result>
+      Type gauge
+      InstancePrefix "clients_active"
+      ValuesFrom "active"
+      InstancesFrom "usename"
+    </Result>
+    <Result>
+      Type gauge
+      InstancePrefix "clients_slow"
+      ValuesFrom "slow"
+      InstancesFrom "usename"
+    </Result>
+  </Query>
+
+   <Database postgres>
+     Host "localhost"
+     User "{{ postgresql_collectd_user }}"
+     Password "{{ postgresql_collectd_password }}"
+     Query tps
+     Query row_stats
+     Query stream_lag
+     Query client_activity
+ 
+     Query disk_io
+     Query disk_usage
+   </Database>
+</Plugin>

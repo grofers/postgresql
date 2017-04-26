@@ -4,7 +4,15 @@
 - name: Ensure datadirectory is empty
   file:
     state: absent
+    path: "{{ postgresql_data_directory }}/"
+  when: "postgresql_repmgr_role != 'master'"
+
+- name: Ensure datadirectory is empty
+  file:
+    state: directory
     path: "{{ postgresql_data_directory }}"
+    owner: postgres
+    group: postgres
   when: "postgresql_repmgr_role != 'master'"
 
 - include: config.yml

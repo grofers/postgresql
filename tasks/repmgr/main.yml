@@ -1,0 +1,29 @@
+---
+# tasks file for ansible-role-repmgr
+
+- name: Ensure datadirectory is empty
+  file:
+    state: absent
+    path: "{{ postgresql_data_directory }}/"
+  when: "postgresql_repmgr_role != 'master'"
+
+- name: Ensure datadirectory is empty
+  file:
+    state: directory
+    path: "{{ postgresql_data_directory }}"
+    owner: postgres
+    group: postgres
+  when: "postgresql_repmgr_role != 'master'"
+
+- include: config.yml
+
+- include: master.yml
+  when: "postgresql_repmgr_role == 'master'"
+
+- include: standby.yml
+  when: "postgresql_repmgr_role == 'standby'"
+
+- include: witness.yml
+  when: "postgresql_repmgr_role == 'witness'"
+
+- include: supervisor.yml

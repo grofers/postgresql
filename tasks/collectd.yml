@@ -1,0 +1,11 @@
+# file: postgresql/tasks/monit.yml
+
+- name: PostgreSQL | Setup collectd configuration
+  template:
+    src: collectd-postgresql.conf.j2
+    dest: /etc/collectd/collectd.conf.d/
+
+- name: PostgreSQL | Restart collectd
+  service:
+    name: collectd
+    state: restarted

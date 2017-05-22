@@ -1,0 +1,15 @@
+---
+
+- name: setup supervisor configuration
+  copy:
+    src: supervisor.conf
+    dest: /etc/supervisor/conf.d/repmgr.conf
+    mode: 644
+    owner: root
+    group: root
+
+- name: update supervisor task
+  shell: supervisorctl update
+
+- name: ensure repmgr supervisor task is running
+  supervisorctl: name=repmgrd state=started

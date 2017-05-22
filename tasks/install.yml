@@ -41,10 +41,20 @@
     update_cache: yes
     cache_valid_time: "{{apt_cache_valid_time | default (3600)}}"
   environment: "{{postgresql_env}}"
+  when: not postgresql_client_only
   with_items:
     - "postgresql-{{postgresql_version}}"
-    - "postgresql-client-{{postgresql_version}}"
     - "postgresql-contrib-{{postgresql_version}}"
+
+- name: PostgreSQL | Install PostgreSQL Client
+  apt:
+    name: "{{item}}"
+    state: present
+    update_cache: yes
+    cache_valid_time: "{{apt_cache_valid_time | default (3600)}}"
+  environment: "{{postgresql_env}}"
+  with_items:
+    - "postgresql-client-{{postgresql_version}}"
 
 - name: PostgreSQL | PGTune
   apt:
@@ -54,3 +64,24 @@
     cache_valid_time: "{{apt_cache_valid_time | default (3600)}}"
   environment: "{{postgresql_env}}"
   when: postgresql_pgtune
+
+- name: PostgreSQL | Install repmgr
+  apt:
+    name: "{{item}}"
+    state: present
+    update_cache: yes
+    cache_valid_time: "{{apt_cache_valid_time | default (3600)}}"
+  environment: "{{postgresql_env}}"
+  when: postgresql_repmgr
+  with_items:
+    - "repmgr"
+    - "supervisor"
+
+- name: PostgreSQL | Install pgpool
+  apt:
+    name: pgpool2
+    state: present
+    update_cache: yes
+    cache_valid_time: "{{apt_cache_valid_time | default (3600)}}"
+  environment: "{{postgresql_env}}"
+  when: postgresql_pgpool2

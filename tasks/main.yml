@@ -15,20 +15,37 @@
   tags: [postgresql, postgresql-install]
 
 - include: extensions.yml
+  when: not postgresql_client_only
   tags: [postgresql, postgresql-extensions]
 
 - include: configure.yml
+  when: not postgresql_client_only
   tags: [postgresql, postgresql-configure]
 
 - include: users.yml
   tags: [postgresql, postgresql-users]
+  when: postgresql_repmgr_role == 'master' and not postgresql_client_only
 
 - include: databases.yml
   tags: [postgresql, postgresql-databases]
+  when: postgresql_repmgr_role == 'master' and not postgresql_client_only
 
 - include: users_privileges.yml
   tags: [postgresql, postgresql-users]
+  when: postgresql_repmgr_role == 'master' and not postgresql_client_only
 
 - include: monit.yml
-  when: monit_protection is defined and monit_protection == true
+  when: monit_protection is defined and monit_protection == true and not postgresql_client_only
   tags: [postgresql, postgresql-monit]
+
+- include: repmgr/main.yml
+  tags: [postgresql, postgresql-repmgr]
+  when: postgresql_repmgr and not postgresql_client_only
+
+- include: config_pgpool2.yml 
+  tags: [postgresql, postgresql-pgpool2]
+  when: postgresql_pgpool2
+
+- include: collectd.yml
+  tags: [postgresql, postgresql-collectd]
+  when: postgresql_collectd == true

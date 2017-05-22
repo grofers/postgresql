@@ -1,0 +1,23 @@
+---
+
+- name: pgpool2 | Setup pgpool2 configuration
+  template:
+    src: "{{ item }}.j2"
+    dest: "/etc/{{ item }}"
+    owner: postgres
+    group: postgres
+  with_items:
+    - "pgpool2/pcp.conf"
+    - "pgpool2/pgpool.conf"
+    - "pgpool2/pool_hba.conf"
+    - "pgpool2/pool_passwd"
+
+- name: PostgreSQL | Enable service
+  service:
+    name: pgpool2
+    enabled: yes
+
+- name: PostgreSQL | Restart pgpool2 service
+  service:
+    name: pgpool2
+    state: restarted
